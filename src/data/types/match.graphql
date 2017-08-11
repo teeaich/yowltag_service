@@ -1,0 +1,23 @@
+type Match {
+    id: ID!
+    tags: [Tag]
+    hashKey: String
+    rangeKey: String
+    lat: Float
+    long: Float
+    users: [User]
+    timestamp: String!
+}
+
+type Query {
+    match(id: ID!): Match
+}
+
+# TODO must be changed when we really want to use it
+type Mutation {
+    createMatch(
+        tag: String!
+        hash_key: Int!
+        range_key: String!
+    ): Match
+}

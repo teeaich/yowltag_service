@@ -1,0 +1,35 @@
+
+prototype chain
+
+- generate random location data with turf.js
+- save the gejson in file
+- import the file in google maps
+
+- is it possible to enhance the geojson with meta data?
+- do some tests with the generated location points to find other points within area with the help of turf.js
+
+- install dynamodb-geo to enhance the db with geospartial functions
+- check how to generate the db schema with serverless instead of the example script of the library
+- is it possible to save the generated data of turf.js into the dynomadb?
+
+
+save location (newLocation)
+ preparaions:
+
+ array of coodinates for hexagon is saved in DB
+
+
+ - catgorize the location to a grid (dont know how, iterate over every feature polygon is not he solution)
+ - save the location with the meta information about the hexagon information in DB
+
+ get all interesting locations (newLocation)
+
+ - query locations
+   - filter for hexagon 
+   - filter for tags
+   -> collection of locations
+
+check for nearest points (filteresLocations)
+- build circular shape with specific radius 
+- check which filteresLocations are in the circular area
+-> collection of locations which are interesting , matching tags and within radius of user

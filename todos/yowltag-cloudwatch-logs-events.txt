@@ -1,0 +1,10 @@
+cloudwatch:
+
+make event for:
+
+when location is saved
+when locations where found
+
+when errors come up
+
+when dynamodb has delete items for locations of user

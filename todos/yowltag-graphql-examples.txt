@@ -1,0 +1,129 @@
+mutation {
+  createLocation(long: 50.22, lat: 8.34, user: "588dc7b0-4e01-11e7-98de-db86d3572b09") {
+    hash_key
+  }
+}
+
+mutation {
+  createLocation(long: 8.223513, lat: 50.077694, user: "153fe910-4e11-11e7-bf2f-07b66dcad40c") {
+    hash_key,
+    range_key,
+    lat,
+    long,
+    user {
+      id
+    }
+  }
+}
+
+mutation {
+  createLocation(long: 8.223513, lat: 50.077694, user: "93f4fe90-4e01-11e7-98de-db86d3572b09") {
+    hash_key,
+    range_key,
+    lat,
+    long,
+
+  }
+}
+
+
+{locationsMatch(long:8.223513 , lat: 50.077694, user: "153fe910-4e11-11e7-bf2f-07b66dcad40c", tags: [{hashs: [ "test2"]}, {hashs: ["test", "test2"]}]) {
+  hash_key,
+  range_key,
+  long,
+  lat,
+  user
+  hashs
+
+} }
+
+
+mutation {createLocationsWithGeoJson(featureCollection: {type: "FeatureCollection", features: [
+  {type: "Feature", geometry: {type: "Point", coordinates: [8.196517352806449,
+          50.075233601725266]}}
+]})}
+
+mutation {createLocationsWithGeoJson(featureCollection: {type: "FeatureCollection", features: [
+  {
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [
+        8.196517352806449,
+        50.075233601725266
+      ]
+    },
+    properties: { tags: [ { hashs: ["test", "test2"] } ] }
+  },
+  {
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [
+        8.192778448929241,
+        50.08259964287731
+      ]
+    },
+    properties: { tags: [ { hashs: ["test", "test2"] } ] }
+  },
+  {
+    type: "Feature",
+    geometry: {
+      type: "Point",
+      coordinates: [
+        8.195598531434626,
+        50.082858274800216
+      ]
+    },
+    properties: { tags: [ { hashs: ["test", "test2"] } ] }
+  }
+]
+}) {
+  hash_key,
+  range_key,
+  long,
+  lat,
+  tags {hashs}
+}}
+
+
+{locationsMatch(long:8.223513 , lat: 50.077694, user: "153fe910-4e11-11e7-bf2f-07b66dcad40c", tags: ["dGVzdCB0ZXN0Mg=="]) {
+  hash_key,
+  range_key,
+  long,
+  lat,
+  user 
+  tags
+  
+} }
+
+{locationsMatch(long:8.223513 , lat: 50.077694, user: "153fe910-4e11-11e7-bf2f-07b66dcad40c", tags: [{hashs: [ "test2"]}, {hashs: ["test", "test2"]}]) {
+  id,
+  long,
+  lat,
+  user 
+  hashs
+  
+} }
+
+{user(id:"93f4fe90-4e01-11e7-98de-db86d3572b09") {
+  id,
+  locations {
+    hash_key
+    range_key
+    long
+    lat
+    timestamp
+  }
+}}
+
+{ locations {
+  id,
+  long,
+  lat,
+  user {
+    id,
+    first_name
+  }
+}}
+

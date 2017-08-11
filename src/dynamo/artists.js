@@ -7,7 +7,6 @@ export function getArtists() {
   const params = {
     TableName,
     AttributesToGet: [
-      'id',
       'first_name',
       'last_name',
     ],

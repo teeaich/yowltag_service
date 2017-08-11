@@ -2,7 +2,8 @@
   "name": "graphql-api",
   "scripts": {
     "babel": "babel --presets es2015 build -d build",
-    "copy": "rsync -r lib/ build",
+    "copy": "rsync -r src/ build",
+    "local_build": "npm-run-all lint:js copy babel",
     "deploy": "npm-run-all lint:js copy babel sls",
     "jest": "jest --coverage",
     "jest:u": "jest -u --coverage",
@@ -18,12 +19,17 @@
     ]
   },
   "dependencies": {
+    "@turf/turf": "^4.4.0",
+    "async": "^2.5.0",
     "aws-sdk": "^2.20.0",
     "babel-runtime": "^6.23.0",
+    "base-64": "^0.1.0",
+    "dynamodb-geo": "^0.3.1",
     "gql-merge": "0.0.4",
     "graphql": "^0.9.1",
     "graphql-server-lambda": "^0.6.0",
     "graphql-tools": "^0.10.1",
+    "lodash": "^4.17.4",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
@@ -31,12 +37,15 @@
     "babel-cli": "^6.23.0",
     "babel-core": "^6.23.1",
     "babel-preset-es2015": "^6.22.0",
+    "babel-register": "^6.24.1",
     "eslint": "^3.16.1",
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
     "jest-cli": "^19.0.2",
     "lambda-tester": "^2.7.0",
     "npm-run-all": "^4.0.2",
-    "serverless-plugin-include-dependencies": "2.0.0"
+    "serverless-offline": "^3.14.1",
+    "serverless-plugin-include-dependencies": "2.0.0",
+    "yargs": "^8.0.1"
   }
 }

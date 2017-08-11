@@ -1,0 +1,76 @@
+# only for putting data directly with geoJson data
+input FeatureCollection {
+    type: String!
+    features: [Feature]
+}
+
+# only for putting data directly with geoJson data
+input Feature {
+    type: String!
+    geometry: Point!
+    properties: Properties
+}
+
+# only for putting data directly with geoJson data
+input Point {
+    type: String!,
+    coordinates: [Float!]
+}
+
+# only for putting data directly with geoJson data
+input Properties {
+    tags_raw: [String]
+    tags: [TagRaw]
+    user: String
+}
+
+# only for putting data directly with geoJson data
+input TagRaw {
+    hashs: [String]
+}
+
+# only for putting data directly with geoJson data
+type LocationRaw {
+    hash_key: Int!
+    range_key: String!
+    long: Float
+    lat: Float
+    user: String
+    hashs: [String]
+}
+
+type Location {
+    hash_key: Int!
+    range_key: String!
+    long: Float!
+    lat: Float!
+    user: User!
+    timestamp: String
+    tags: [Tag]
+    matches: [Location]
+}
+
+type Query {
+    locationsMatch(long: Float!, lat: Float!, user: String, tags: [TagRaw] ): [LocationRaw]
+    location(hash_key: Int!, range_key: String!): Location
+}
+
+type Mutation {
+    createLocation(
+        long: Float!
+        lat: Float!
+        user: String!
+    ): Location
+    createLocationsWithGeoJson(
+        featureCollection: FeatureCollection
+    ): [LocationRaw]
+    updateLocation(
+        id: ID!
+        long: Float
+        lat: Float
+        user: String
+    ): Location
+    deleteLocation(
+        id: ID!
+    ): Location
+}

@@ -35,16 +35,28 @@ function buildLocation(dbLocation, isRaw) {
   return locationResult;
 }
 
-export function buildLocationForMatch(dbLocation) {
-  const coordinatesParsed = JSON.parse(dbLocation.geoJson.S);
-  return {
-    hash_key: dbLocation.hashKey.N,
-    range_key: dbLocation.rangeKey.S,
-    lat: coordinatesParsed.coordinates[1],
-    long: coordinatesParsed.coordinates[0],
-    user: dbLocation.user.S,
-    hashs: tagService.transformTagsForView(tagService.transformTagsFromDB(dbLocation.tags)),
-  };
+export function getTagsFromIntersectionLocation(singleTagArray, foundedLocationTagArray) {
+  return _.intersectionBy(singleTagArray, foundedLocationTagArray, 'hashs');
+}
+
+export function buildLocationsForMatch(foundedCompleteIntersectionInfo) {
+  return foundedCompleteIntersectionInfo.map((intersectionLocation) => {
+    const coordinatesParsed = JSON.parse(intersectionLocation.foundedLocation.geoJson.S);
+    const hashsFromIntersectionLocation =
+      getTagsFromIntersectionLocation(
+        intersectionLocation.tags,
+        tagService.transformTagsFromDB(intersectionLocation.foundedLocation.tags),
+      );
+    return {
+      hash_key: intersectionLocation.foundedLocation.hashKey.N,
+      range_key: intersectionLocation.foundedLocation.rangeKey.S,
+      lat: coordinatesParsed.coordinates[1],
+      long: coordinatesParsed.coordinates[0],
+      user: intersectionLocation.foundedLocation.user.S,
+      hashs: tagService.transformTagsForView(hashsFromIntersectionLocation),
+    };
+  });
+
 }
 
 /**
@@ -79,17 +91,22 @@ function buildSingleLocations(dbLocations) {
   return dbLocations.map(l => buildSingleLocation(l));
 }
 
-// TODO check how different are the ownLocation for SNS and for all other graphql realted queries
-// TODO the transformTo and transformFrom function ae completely broken
+export function getOwnLocationData({ lat, long, tags_raw, tags, user }) {
+  const ownLocation = {
+    lat,
+    long,
+  };
+  if (!tags_raw && !tags && !user) {
+    return ('You have to provide property tags or tags_raw when no user property is provided.');
+  }
+
+}
+
 export function getLocationsMatch(args) {
   return new Promise((resolve, reject) => {
-    const ownLocation = {
-      lat: args.lat,
-      long: args.long,
-    };
-    if (!args.tags_raw && !args.tags && !args.user) {
-      reject('You have to provide property tags or tags_raw when no user property is provided.');
-    }
+    const ownLocation = getOwnLocationData(args);
+
+
     /**
      * There is no tags property
      * Try to get the tags with query for user
@@ -102,7 +119,7 @@ export function getLocationsMatch(args) {
           ownLocation.tags_raw = tagService.transformTagsForDB(dbData);
           console.log(ownLocation);
           matchService.queryAndFindMatches(ownLocation)
-            .then(result => resolve(result.locationsForGraphql))
+            .then(result => resolve(buildLocationsForMatch(result)))
             .catch(error => reject(error));
         })
         .catch(error => reject(error));
@@ -114,7 +131,7 @@ export function getLocationsMatch(args) {
       console.log(`Found tags in tags_raw property for location parameter: ${JSON.stringify(args)}`);
       ownLocation.tags_raw = args.tags_raw;
       matchService.queryAndFindMatches(ownLocation)
-        .then(result => resolve(result.locationsForGraphql))
+        .then(result => resolve(buildLocationsForMatch(result)))
         .catch(error => reject(error));
     }
   });

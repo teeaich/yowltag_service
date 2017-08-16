@@ -3,7 +3,6 @@
  */
 import _ from 'lodash';
 import * as tagService from './tagService';
-import * as dbLocations from '../dynamo/locations';
 
 const ddbGeo = require('dynamodb-geo');
 const AWS = require('aws-sdk');
@@ -43,24 +42,17 @@ export function queryAndFindMatches(ownLocation) {
         console.log(`Your own location is: ${JSON.stringify(ownLocation)}`);
         console.log(`Without tag filter/unique user entries found ${foundedLocations.length} locations.`);
         console.log(`Without tag filter/unique user entries found following locations ${JSON.stringify(foundedLocations)}.`);
-        const foundedLocationFilteredUniqueUserEntries =
+        const foundedLocationFilteredByUniqueUserEntries =
           sortAndFilterByUniqUser(foundedLocations);
-        console.log(`Without tag filter but filtered unique user entries found ${foundedLocationFilteredUniqueUserEntries.length} locations.`);
-        console.log(`Without tag filter but filtered unique user entries found following locations ${JSON.stringify(foundedLocationFilteredUniqueUserEntries)}.`);
-        let foundedLocationFilteredUniqueUserEntrisMatchedTags = [];
-        tagService.findMatchingTags(ownLocation, foundedLocationFilteredUniqueUserEntries)
-          .then((l) => {
-            foundedLocationFilteredUniqueUserEntrisMatchedTags = l.filteredLocations;
-            console.log(`With tag filter/unique user entries found ${foundedLocationFilteredUniqueUserEntrisMatchedTags.length} locations.`);
-            console.log(`With tag filter/unique user entries found following locations ${JSON.stringify(foundedLocationFilteredUniqueUserEntrisMatchedTags)}.`);
+        console.log(`Without tag filter but filtered unique user entries found ${foundedLocationFilteredByUniqueUserEntries.length} locations.`);
+        console.log(`Without tag filter but filtered unique user entries found following locations ${JSON.stringify(foundedLocationFilteredByUniqueUserEntries)}.`);
+        tagService.findMatchingTags(ownLocation, foundedLocationFilteredByUniqueUserEntries)
+          .then(({ filteredLocations, foundedCompleteIntersectionInfo }) => {
+            console.log(`With tag filter/unique user entries found ${filteredLocations.length} locations.`);
+            console.log(`With tag filter/unique user entries found following locations ${JSON.stringify(filteredLocations)}.`);
+            console.log(`Final result of completeIntersectionInfo ${JSON.stringify(foundedCompleteIntersectionInfo)}`);
 
-            console.log(`Final result of completeIntersectionInfo ${JSON.stringify(l.foundedCompleteIntersectionInfo)}`);
-
-            const foundedLocationResult = foundedLocationFilteredUniqueUserEntrisMatchedTags
-              .map(location => dbLocations.buildLocationForMatch(location));
-            const finalResult = l;
-            finalResult.locationsForGraphql = foundedLocationResult;
-            resolve(finalResult);
+            resolve(foundedCompleteIntersectionInfo);
           });
       })
       .catch((error) => {

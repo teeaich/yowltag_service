@@ -39,6 +39,17 @@ export function transformTagsForView(base64Tags) {
   return [];
 }
 
+export function getIntersections(ownTags, locationTags) {
+  console.log(`input of getIntersections: ownTags -> ${JSON.stringify(ownTags)} and locationTags -> ${JSON.stringify(locationTags)}`);
+  const ownTagsAlone = ownTags.map(tag => tag.hashs);
+  const locationsTagsAlone = locationTags.map(tag => tag.hashs);
+  console.log(`ownTagsAlone: ${JSON.stringify(ownTagsAlone)}, locationTagsAlone: ${JSON.stringify(locationsTagsAlone)}`);
+  const intersection =
+    _.intersection(ownTagsAlone, locationsTagsAlone);
+  console.log(`intersection of ${JSON.stringify(ownTagsAlone)} and ${JSON.stringify(locationsTagsAlone)} -> ${intersection}`);
+  return intersection;
+}
+
 
 export function findMatchingTags(ownLocation, foundedLocations) {
   return new Promise((resolve, reject) => {
@@ -57,32 +68,26 @@ export function findMatchingTags(ownLocation, foundedLocations) {
     }
     let foundedCompleteIntersectionInfo = [];
     async.filter(foundedLocations, (l, cb) => {
-      function getIntersections(ownTags, locationTags) {
-        console.log(`input of getIntersections: ownTags -> ${JSON.stringify(ownTags)} and locationTags -> ${JSON.stringify(locationTags)}`);
-        const ownTagsAlone = ownTags.map(tag => tag.hashs);
-        const locationsTagsAlone = locationTags.map(tag => tag.hashs);
-        console.log(`ownTagsAlone: ${JSON.stringify(ownTagsAlone)}, locationTagsAlone: ${JSON.stringify(locationsTagsAlone)}`);
-        const intersection =
-          _.intersection(ownTagsAlone, locationsTagsAlone);
-        console.log(`intersection of ${JSON.stringify(ownTagsAlone)} and ${JSON.stringify(locationsTagsAlone)} -> ${intersection}`);
+      const tagsFromFoundedLocations = transformTagsFromDB(l.tags);
+      const intersection = getIntersections(tagsFromOwnLocation, tagsFromFoundedLocations);
+
+      try {
+        // TODO make new functions for this -> then test is possible
         if (intersection.length) {
           // Which of the own hashs had matched?
-          const completeIntersectionInfo = intersection.map(matchedIntersection => ({
-            tags: _.filter(ownTags, tag => tag.hashs === matchedIntersection),
-            foundedLocation: l,
-          }),
+          const completeIntersectionInfo = intersection.map(matchedIntersection => (
+            {
+              tags: _.filter(tagsFromOwnLocation, tag => tag.hashs === matchedIntersection),
+              foundedLocation: l,
+            }
+            ),
           );
           foundedCompleteIntersectionInfo =
             foundedCompleteIntersectionInfo.concat(completeIntersectionInfo);
-          return true;
+          cb(null, true);
+        } else {
+          cb(null, false);
         }
-        return false;
-      }
-
-
-      try {
-        const tagsFromFoundedLocations = transformTagsFromDB(l.tags);
-        cb(null, getIntersections(tagsFromOwnLocation, tagsFromFoundedLocations));
       } catch (error) {
         cb(error);
       }

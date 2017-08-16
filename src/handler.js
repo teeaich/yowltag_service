@@ -63,7 +63,7 @@ exports.findMatches = (event, context, callback) => {
       // TODO: still to implement - use a new table with id/tag_id/location_id/timestamp
       // maxbe an security issue that the client will see all the location infos from other user
       // graphql should be responsible to query the elements itself.
-      dbMatches.createMatches(ownLocation, foundedLocations.foundedCompleteIntersectionInfo)
+      dbMatches.createMatches(ownLocation, foundedLocations)
         .then(dbData => callback(null, dbData));
     })
     .catch((error) => {

@@ -7,6 +7,8 @@ const resolvers = {
   Query: {
     locationsMatch: (_, args) => dbLocations.getLocationsMatch(args),
     location: (_, args) => dbLocations.getLocationsById(args),
+    record: (_, args) => dbRecords.getRecord(args.id),
+    records: () => dbRecords.getRecords(),
     users: () => dbUsers.getUsers(),
     user: (_, args) => dbUsers.getUserById(args.id),
     tag: (_, args) => dbTags.getTagById(args.id),
@@ -15,6 +17,7 @@ const resolvers = {
   },
   Mutation: {
     createLocation: (_, args) => dbLocations.createLocation(args),
+    createLocationRecord: (_, args) => dbLocations.createLocationRecord(args),
     createLocationsWithGeoJson: (_, args) => dbLocations.createLocationsWithGeoJson(args),
     updateLocation: (_, args) => dbLocations.updateLocation(args),
     deleteLocation: (_, args) => dbLocations.deleteLocation(args),

@@ -1,0 +1,20 @@
+type Recorddata {
+    id: ID!
+    recordId: String!
+    lat: Float!
+    long: Float!
+    timestamp: String!
+    dataObject: String
+}
+
+type Query {
+}
+
+type Mutation {
+    createRecorddata(
+        recordId: String!
+        long: Float!
+        lat: Float!
+        dataObject: String!
+    ): Recorddata
+}

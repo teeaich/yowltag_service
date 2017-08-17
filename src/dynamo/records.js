@@ -21,19 +21,6 @@ const TableName = 'locations';
   * long: (*|Glacier.long|StorageGateway.long|number|string|CloudFront.long),
   * user: (boolean|*)}}
  */
-function buildLocation(dbLocation, isRaw) {
-  const hashKey = dbLocation.PutItemInput.Item.hashKey;
-  const locationResult = {
-    hash_key: hashKey ? hashKey.N : 0,
-    range_key: dbLocation.RangeKeyValue.S,
-    lat: dbLocation.GeoPoint.latitude,
-    long: dbLocation.GeoPoint.longitude,
-    user: dbLocation.PutItemInput.Item.user.S,
-    timestamp: dbLocation.PutItemInput.Item.timestamp.S,
-  };
-  if (isRaw) locationResult.hashs = dbLocation.PutItemInput.Item.tags.SS;
-  return locationResult;
-}
 
 function buildLocationForRecord(dbLocationRecord) {
   return {

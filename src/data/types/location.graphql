@@ -48,11 +48,13 @@ type Location {
     timestamp: String
     tags: [Tag]
     matches: [Location]
+    dataObject: String
 }
 
 type Query {
     locationsMatch(long: Float!, lat: Float!, user: String, tags: [TagRaw] ): [LocationRaw]
     location(hash_key: Int!, range_key: String!): Location
+    locationRecords: [Location]
 }
 
 type Mutation {
@@ -60,6 +62,12 @@ type Mutation {
         long: Float!
         lat: Float!
         user: String!
+    ): Location
+    createLocationRecord(
+        long: Float!
+        lat: Float!
+        user: String!
+        dataObject: String!
     ): Location
     createLocationsWithGeoJson(
         featureCollection: FeatureCollection

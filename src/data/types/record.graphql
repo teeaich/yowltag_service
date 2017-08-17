@@ -1,0 +1,23 @@
+type Record {
+    id: ID!
+    user: User!
+    name: String!
+    timestamp: String
+    recordData: [Recorddata]
+}
+
+type Query {
+    record(id: ID!): Record
+    records: [Record]
+    locationRecords: [Location]
+}
+
+type Mutation {
+    createRecord(
+        user: String!
+        name: String!
+    ): Record
+    deleteRecord(
+        id: ID!
+    ): Record
+}

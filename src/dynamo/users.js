@@ -46,7 +46,6 @@ export function getUsersByIds(userIds) {
       })
       .catch(error => reject(error));
   });
-
 }
 
 export function createUser(args) {

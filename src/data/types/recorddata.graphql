@@ -5,6 +5,7 @@ type Recorddata {
     long: Float!
     timestamp: String!
     dataObject: String
+    bgGeoConfig: String
 }
 
 type Query {
@@ -16,5 +17,6 @@ type Mutation {
         long: Float!
         lat: Float!
         dataObject: String!
+        bgGeoConfig: String!
     ): Recorddata
 }

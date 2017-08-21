@@ -2,12 +2,14 @@ import * as dbLocations from '../dynamo/locations';
 import * as dbUsers from '../dynamo/users';
 import * as dbTags from '../dynamo/tags';
 import * as dbMatches from '../dynamo/matches';
+import * as dbRecords from '../dynamo/records';
+import * as dbRecorddata from '../dynamo/recorddata';
 
 const resolvers = {
   Query: {
     locationsMatch: (_, args) => dbLocations.getLocationsMatch(args),
     location: (_, args) => dbLocations.getLocationsById(args),
-    record: (_, args) => dbRecords.getRecord(args.id),
+    record: (_, args) => dbRecords.getRecordById(args.id),
     records: () => dbRecords.getRecords(),
     users: () => dbUsers.getUsers(),
     user: (_, args) => dbUsers.getUserById(args.id),
@@ -17,7 +19,8 @@ const resolvers = {
   },
   Mutation: {
     createLocation: (_, args) => dbLocations.createLocation(args),
-    createLocationRecord: (_, args) => dbLocations.createLocationRecord(args),
+    createRecord: (_, args) => dbRecords.createRecord(args),
+    createRecorddata: (_, args) => dbRecorddata.createRecorddata(args),
     createLocationsWithGeoJson: (_, args) => dbLocations.createLocationsWithGeoJson(args),
     updateLocation: (_, args) => dbLocations.updateLocation(args),
     deleteLocation: (_, args) => dbLocations.deleteLocation(args),
@@ -43,6 +46,10 @@ const resolvers = {
   Match: {
     tags: match => dbTags.getTagsByIds(match.tagIds),
     users: match => dbUsers.getUsersByIds(match.userIds),
+  },
+  Record: {
+    user: record => dbUsers.getUserById(record.user),
+    recordData: record => dbRecorddata.getRecorddataByRecordId(record.id),
   },
 };
 

@@ -4,6 +4,7 @@
     "babel": "babel --presets es2015 build -d build",
     "copy": "rsync -r src/ build",
     "local_build": "npm-run-all lint:js copy babel",
+    "offline": "export AWS_REGION=us-east-1 && sls offline --offline=enable",
     "deploy": "npm-run-all lint:js copy babel sls",
     "jest": "jest --coverage",
     "jest:u": "jest -u --coverage",

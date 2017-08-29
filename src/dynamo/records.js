@@ -24,8 +24,17 @@ export function getRecordById(id) {
       id,
     },
   };
-
-  return db.get(params);
+  return new Promise((resolve, reject) => {
+    db.get(params)
+      .then((dbData) => {
+        // TODO add function for this
+        //console.log(dbData.recordData[0]);
+        //console.log(dbData.recordData[dbData.recordData.length - 1]);
+        //const additionalDatawithDbData = dbData.map(record => Object.assign({}, record, { battery: 0.0, bgGeoConfig: 'not available' }));
+        resolve(dbData);
+      })
+      .catch(error => reject(error));
+  });
 }
 
 export function createRecord(args) {

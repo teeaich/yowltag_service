@@ -173,7 +173,7 @@ resources:
           - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
+          ReadCapacityUnits: 10
           WriteCapacityUnits: 1
         TableName: 'recorddata'
 

@@ -33,7 +33,35 @@ export function getRecorddataByRecordId(recordId) {
   return new Promise((resolve, reject) => {
     db.scan(params)
       .then((dbData) => {
-        resolve(_.orderBy(dbData, m => m.timestamp, 'desc'));
+        // TODO make new function for that
+        const defaultBattery = {
+          battery: {
+            level: 0,
+          },
+        };
+        const orderedRecorddata = _.orderBy(dbData, m => m.timestamp, 'desc');
+        let parsedFirstRecorddata;
+        let parsedLastRecorddata;
+        let bgGeoConfig;
+        try {
+          parsedFirstRecorddata = JSON.parse(orderedRecorddata[0].dataObject);
+          parsedLastRecorddata = JSON.parse(orderedRecorddata[dbData.length - 1].dataObject);
+        } catch (error) {
+          parsedFirstRecorddata = defaultBattery;
+          parsedLastRecorddata = defaultBattery;
+        }
+        try {
+          bgGeoConfig = orderedRecorddata[0].bgGeoConfig;
+        } catch (error) {
+          bgGeoConfig = 'not available';
+        }
+        resolve({
+          batteryDrain: parseFloat(
+            parsedLastRecorddata.battery.level - parsedFirstRecorddata.battery.level,
+          ),
+          bgGeoConfig,
+          data: orderedRecorddata,
+        });
       })
       .catch(error => reject(error));
   });

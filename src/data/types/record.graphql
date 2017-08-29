@@ -3,7 +3,13 @@ type Record {
     user: User!
     name: String!
     timestamp: String
-    recordData: [Recorddata]
+    recordData: RecorddataType,
+}
+
+type RecorddataType {
+    batteryDrain: Float,
+    bgGeoConfig: String,
+    data: [Recorddata]
 }
 
 type Query {

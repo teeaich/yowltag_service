@@ -21,7 +21,7 @@ export function getRecorddata() {
   return db.scan(params);
 }
 
-export function getRecorddataByRecordId(recordId) {
+export async function getRecorddataByRecordId(recordId) {
   const params = {
     TableName,
     FilterExpression: '#record = :record_id',
@@ -30,41 +30,36 @@ export function getRecorddataByRecordId(recordId) {
     },
     ExpressionAttributeValues: { ':record_id': recordId },
   };
-  return new Promise((resolve, reject) => {
-    db.scan(params)
-      .then((dbData) => {
-        // TODO make new function for that
-        const defaultBattery = {
-          battery: {
-            level: 0,
-          },
-        };
-        const orderedRecorddata = _.orderBy(dbData, m => m.timestamp, 'desc');
-        let parsedFirstRecorddata;
-        let parsedLastRecorddata;
-        let bgGeoConfig;
-        try {
-          parsedFirstRecorddata = JSON.parse(orderedRecorddata[0].dataObject);
-          parsedLastRecorddata = JSON.parse(orderedRecorddata[dbData.length - 1].dataObject);
-        } catch (error) {
-          parsedFirstRecorddata = defaultBattery;
-          parsedLastRecorddata = defaultBattery;
-        }
-        try {
-          bgGeoConfig = orderedRecorddata[0].bgGeoConfig;
-        } catch (error) {
-          bgGeoConfig = 'not available';
-        }
-        resolve({
-          batteryDrain: parseFloat(
-            parsedLastRecorddata.battery.level - parsedFirstRecorddata.battery.level,
-          ),
-          bgGeoConfig,
-          data: orderedRecorddata,
-        });
-      })
-      .catch(error => reject(error));
-  });
+  const dbData = await db.scan(params);
+  // TODO make new function for that
+  const defaultBattery = {
+    battery: {
+      level: 0,
+    },
+  };
+  const orderedRecorddata = _.orderBy(dbData, m => m.timestamp, 'desc');
+  let parsedFirstRecorddata;
+  let parsedLastRecorddata;
+  let bgGeoConfig;
+  try {
+    parsedFirstRecorddata = JSON.parse(orderedRecorddata[0].dataObject);
+    parsedLastRecorddata = JSON.parse(orderedRecorddata[dbData.length - 1].dataObject);
+  } catch (error) {
+    parsedFirstRecorddata = defaultBattery;
+    parsedLastRecorddata = defaultBattery;
+  }
+  try {
+    bgGeoConfig = orderedRecorddata[0].bgGeoConfig;
+  } catch (error) {
+    bgGeoConfig = 'not available';
+  }
+  return {
+    batteryDrain: parseFloat(
+      parsedLastRecorddata.battery.level - parsedFirstRecorddata.battery.level,
+    ),
+    bgGeoConfig,
+    data: orderedRecorddata,
+  };
 }
 
 export function createRecorddata(args) {

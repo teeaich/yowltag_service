@@ -7,6 +7,8 @@ type Match {
     long: Float
     users: [User]
     timestamp: String!
+    matchStatus: String
+    matchCounter: Int
 }
 
 type Query {

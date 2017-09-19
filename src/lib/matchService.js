@@ -2,6 +2,7 @@
  * Created by ht3597 on 20.06.2017.
  */
 import _ from 'lodash';
+import base64 from 'base-64';
 import * as tagService from './tagService';
 
 const ddbGeo = require('dynamodb-geo');
@@ -59,4 +60,24 @@ export function queryAndFindMatches(ownLocation) {
         reject(error);
       });
   });
+}
+
+export function createUniqueMatchIdFromTagIds(tagIdArray) {
+  return base64.encode(tagIdArray.sort().join());
+}
+
+/**
+ *
+ * @param match
+ * @returns {[String,String]}
+ * responsible of extracting the id of the first match and
+ * getting the id a way more complicated of the second match
+ */
+export function getArrayOfBothTagIds(match) {
+  const { hashs, id } = match.tags[0];
+  return [
+    id,
+    match.foundedLocation.tags.L.find(
+      hashElement => hashElement.M.hashs.S === hashs).M.id.S,
+  ];
 }

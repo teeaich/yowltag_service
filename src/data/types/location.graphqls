@@ -48,13 +48,11 @@ type Location {
     timestamp: String
     tags: [Tag]
     matches: [Location]
-    dataObject: String
 }
 
 type Query {
     locationsMatch(long: Float!, lat: Float!, user: String, tags: [TagRaw] ): [LocationRaw]
     location(hash_key: Int!, range_key: String!): Location
-    locationRecords: [Location]
 }
 
 type Mutation {

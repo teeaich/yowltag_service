@@ -7,7 +7,7 @@ import * as dbTags from './tags';
 import * as tagService from './../lib/tagService';
 import * as matchService from './../lib/matchService';
 
-require('util').inspect.defaultOptions.depth = null
+require('util').inspect.defaultOptions.depth = null;
 
 const TableName = 'locations';
 
@@ -45,6 +45,7 @@ function buildLocationForRecord(dbLocationRecord) {
     timestamp: dbLocationRecord.timestamp,
   };
 }
+
 export function getTagsFromIntersectionLocation(singleTagArray, foundedLocationTagArray) {
   return _.intersectionBy(singleTagArray, foundedLocationTagArray, 'hashs');
 }
@@ -66,7 +67,6 @@ export function buildLocationsForMatch(foundedCompleteIntersectionInfo) {
       hashs: tagService.transformTagsForView(hashsFromIntersectionLocation),
     };
   });
-
 }
 
 /**
@@ -146,7 +146,7 @@ export function getLocationsMatch(args) {
   });
 }
 
-export function getLocationsById(args) {
+export async function getLocationsById(args) {
   const params = {
     TableName,
     Key: {
@@ -163,16 +163,11 @@ export function getLocationsById(args) {
     ],
   };
 
-  return new Promise((resolve, reject) => {
-    db.get(params)
-      .then((dbData) => {
-        resolve(buildSingleLocation(dbData));
-      })
-      .catch(error => reject(error));
-  });
+  const dbData = await db.get(params);
+  return buildSingleLocation(dbData);
 }
 
-export function getLocationsByUser(userId) {
+export async function getLocationsByUser(userId) {
   const params = {
     TableName,
     FilterExpression: '#user = :user_id',
@@ -181,13 +176,8 @@ export function getLocationsByUser(userId) {
     },
     ExpressionAttributeValues: { ':user_id': userId },
   };
-  return new Promise((resolve, reject) => {
-    db.scan(params)
-      .then((dbData) => {
-        resolve(buildSingleLocations(dbData));
-      })
-      .catch(error => reject(error));
-  });
+  const dbData = await db.scan(params);
+  return buildSingleLocations(dbData);
 }
 
 export function createLocation(args) {
@@ -232,7 +222,7 @@ export function createLocation(args) {
               TopicArn: `arn:aws:sns:${region}:${accountId}:dispatcher`,
             };
             console.log(`Throw SNS with following data: ${JSON.stringify(snsParams)}`);
-            sns.publish(snsParams, (error, data) => {
+            sns.publish(snsParams, (error) => {
               if (error) {
                 reject(error);
               }
@@ -245,48 +235,22 @@ export function createLocation(args) {
   });
 }
 
-export function createLocationRecord(args) {
-  return new Promise((resolve, reject) => {
-    const params = {
-      TableName: 'records',
-      Item: {
-        id: uuid(),
-        user: args.user,
-        lat: args.lat,
-        long: args.long,
-        dataObject: args.dataObject,
-        name: args.name,
-        timestamp: new Date().getTime().toString(),
-      },
-    };
+export async function createLocationRecord(args) {
+  const params = {
+    TableName: 'records',
+    Item: {
+      id: uuid(),
+      user: args.user,
+      lat: args.lat,
+      long: args.long,
+      dataObject: args.dataObject,
+      name: args.name,
+      timestamp: new Date().getTime().toString(),
+    },
+  };
 
-    db.createItem(params)
-      .then((dbData) => {
-        resolve(buildLocationForRecord(dbData));
-      })
-      .catch(error => reject(`${error}: Error in creating locations record.`));
-  });
-}
-
-export function getLocationRecords() {
-  return new Promise((resolve, reject) => {
-    const params = {
-      TableName,
-      AttributesToGet: [
-        'id',
-        'long',
-        'lat',
-        'dataObject',
-        'timestamp',
-        'user',
-      ],
-    };
-    db.scan(params)
-      .then((dbData) => {
-        resolve(buildLocationsForRecord(dbData));
-      })
-      .catch(error => reject(`${error}: Error in getting location records.`));
-  });
+  const dbData = await db.createItem(params);
+  return buildLocationForRecord(dbData);
 }
 
 
@@ -327,8 +291,8 @@ export function createLocationsWithGeoJson(args) {
       PutItemInput: {
         Item: { // The primary key, geohash and geojson data is filled in for you
           // Specify attribute values using { type: value } objects, like the DynamoDB API.
-          user: { S: user ? user : uuid.v4() },
-          tags: { SS: tags ? tags : feature.properties.tags_raw },
+          user: { S: user || uuid.v4() },
+          tags: { SS: tags || feature.properties.tags_raw },
           timestamp: { S: new Date().getTime().toString() },
         },
       },

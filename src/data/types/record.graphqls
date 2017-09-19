@@ -15,7 +15,6 @@ type RecorddataType {
 type Query {
     record(id: ID!): Record
     records: [Record]
-    locationRecords: [Location]
 }
 
 type Mutation {
